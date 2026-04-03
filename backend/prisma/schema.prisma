@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(USER)
+  tags        Json     // string[]
+  description String?
+  availabilities Availability[]
+  callsAsUser Calls[]  @relation("UserCalls")
+  callsAsMentor Calls[] @relation("MentorCalls")
+
+  @@map("users")
+}
+
+model Availability {
+  id     String @id @default(cuid())
+  userId String
+  date   String // '2024-10-07'
+  start  String // '17:00'
+  end    String // '19:00'
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date, start])
+  @@map("availabilities")
+}
+
+model Calls {
+  id        String   @id @default(cuid())
+  userId    String
+  mentorId  String
+  time      DateTime
+  status    String   @default("scheduled") // scheduled, completed, cancelled
+  user      User     @relation("UserCalls", fields: [userId], references: [id])
+  mentor    User     @relation("MentorCalls", fields: [mentorId], references: [id])
+
+  @@map("calls")
+}
+
+enum Role {
+  USER
+  MENTOR
+  ADMIN
+}
+
