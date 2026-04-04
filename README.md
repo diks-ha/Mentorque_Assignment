@@ -29,14 +29,62 @@ npm run dev
 - Calls: Resume/Job/Mock + overlap check
 - DB: PostgreSQL + Prisma
 
-## Deploy
-**Backend** (Railway/Render):
-- .env: DATABASE_URL, JWT_SECRET
-- prisma migrate deploy
-- node seedData.js
+## Deploy Instructions
 
-**Frontend** (Vercel):
-- .env: VITE_API_URL=your-backend-url
+### Backend (Railway)
+**Build Command**: `prisma generate`
+**Start Command**: `npm start`
+1. Fork repo
+2. Railway: `New Project` → GitHub → Backend folder
+3. Railway Variables:
+```
+DATABASE_URL=postgresql://... (NeonDB)
+JWT_SECRET=your-super-secret-key-min-32-chars
+```
+4. CLI: `railway run prisma migrate deploy`
+5. CLI: `railway run node src/scripts/seedData.js`
+6. Done → Railway URL
+
+**Render**:
+- Build: `npm install && prisma generate`
+- Start: `npm start`
+- Env: DATABASE_URL, JWT_SECRET
+
+### Frontend (Vercel)
+**Build**: `npm run build`
+**Output**: `dist`
+**Start**: `npm run preview`
+1. Vercel Import Frontend
+2. Env: `VITE_API_URL=https://backend.railway.app`
+3. Deploy
+
+### NeonDB (Recommended)
+1. neon.tech → Create project → Postgres → Copy URL
+2. Backend .env DATABASE_URL=neon-url
+
+Test: frontend.vercel.app → admin@example.com/admin123
+
+### Frontend (Vercel/Netlify)
+1. Fork repo
+2. Vercel: Import GitHub → Frontend
+3. Add var:
+```
+VITE_API_URL=https://your-backend.railway.app
+```
+4. Deploy: https://your-app.vercel.app
+
+### Supabase (DB)
+1. New project
+2. Copy DATABASE_URL from Settings
+3. Paste backend .env
+4. `prisma db push` / migrate deploy
+
+**Test**: https://frontend.vercel.app → admin@example.com / admin123
+
+**Production**:
+- JWT_SECRET 64+ chars
+- NeonDB (serverless Postgres)
+- Railway/Vercel auto-deploy
 
 ## Test Creds
 - Admin: admin@example.com/admin123
